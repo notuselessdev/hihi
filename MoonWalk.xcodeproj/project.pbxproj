@@ -16,6 +16,7 @@
 		AA000012 /* SpeechBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000013 /* SpeechBubbleView.swift */; };
 		AA000014 /* MoonwalkTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000015 /* MoonwalkTimer.swift */; };
 		AA000016 /* LaunchAtLoginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000017 /* LaunchAtLoginManager.swift */; };
+		AA000018 /* PreferencesManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000019 /* PreferencesManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,7 @@
 		AA000013 /* SpeechBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechBubbleView.swift; sourceTree = "<group>"; };
 		AA000015 /* MoonwalkTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoonwalkTimer.swift; sourceTree = "<group>"; };
 		AA000017 /* LaunchAtLoginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginManager.swift; sourceTree = "<group>"; };
+		AA000019 /* PreferencesManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreferencesManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +64,7 @@
 				AA000013 /* SpeechBubbleView.swift */,
 				AA000015 /* MoonwalkTimer.swift */,
 				AA000017 /* LaunchAtLoginManager.swift */,
+				AA000019 /* PreferencesManager.swift */,
 				AA00000F /* hihi.m4a */,
 				AA000004 /* Assets.xcassets */,
 				AA000006 /* Info.plist */,
@@ -155,6 +158,7 @@
 				AA000012 /* SpeechBubbleView.swift in Sources */,
 				AA000014 /* MoonwalkTimer.swift in Sources */,
 				AA000016 /* LaunchAtLoginManager.swift in Sources */,
+				AA000018 /* PreferencesManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

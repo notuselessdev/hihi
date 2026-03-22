@@ -7,8 +7,12 @@ final class MoonwalkTimer {
 
     static let shared = MoonwalkTimer()
 
-    private static let minInterval: TimeInterval = 5 * 60   // 5 minutes
-    private static let maxInterval: TimeInterval = 30 * 60  // 30 minutes
+    private var minInterval: TimeInterval {
+        PreferencesManager.shared.minIntervalMinutes * 60
+    }
+    private var maxInterval: TimeInterval {
+        PreferencesManager.shared.maxIntervalMinutes * 60
+    }
 
     private var timer: Timer?
     private var isPaused = false
@@ -54,7 +58,7 @@ final class MoonwalkTimer {
 
     private func scheduleNext() {
         timer?.invalidate()
-        let interval = TimeInterval.random(in: Self.minInterval...Self.maxInterval)
+        let interval = TimeInterval.random(in: minInterval...maxInterval)
         timer = Timer.scheduledTimer(withTimeInterval: interval, repeats: false) { [weak self] _ in
             Task { @MainActor in
                 self?.fire()

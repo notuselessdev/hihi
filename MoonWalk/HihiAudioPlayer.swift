@@ -13,6 +13,7 @@ final class HihiAudioPlayer {
 
     /// Plays the hihi sound once. Does nothing if the system is muted.
     func play() {
+        guard PreferencesManager.shared.soundEnabled else { return }
         guard !isSystemMuted() else { return }
 
         guard let url = Bundle.main.url(forResource: "hihi", withExtension: "m4a") else { return }
