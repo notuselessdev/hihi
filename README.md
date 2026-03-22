@@ -1,8 +1,16 @@
-# Hihi
+<p align="center">
+  <img src="mj.png" alt="Hihi" width="200">
+</p>
 
-![Hihi](mj.png)
+<h1 align="center">Hihi</h1>
 
-A macOS menu bar app that makes Michael Jackson moonwalk across the bottom of your screen at random intervals, complete with "hee-hee!" and "hoooo!" sound effects and speech bubbles.
+<p align="center">A macOS menu bar app that makes Michael Jackson moonwalk across the bottom of your screen at random intervals, complete with "hee-hee!" and "hoooo!" sound effects and speech bubbles.</p>
+
+<p align="center">
+  <a href="https://github.com/notuselessdev/hihi/releases/latest"><img src="https://img.shields.io/github/v/release/notuselessdev/hihi" alt="Release"></a>
+  <a href="https://github.com/notuselessdev/hihi/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License"></a>
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-blue" alt="Platform">
+</p>
 
 > **Fan-made project.** It is not affiliated with, endorsed by, or associated with the Michael Jackson estate or any related entities. All trademarks belong to their respective owners.
 
