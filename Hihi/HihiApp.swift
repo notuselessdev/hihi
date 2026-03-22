@@ -1,19 +1,19 @@
 import SwiftUI
 
 @main
-struct MoonWalkApp: App {
-    @ObservedObject private var animator = MoonwalkAnimator.shared
+struct HihiApp: App {
+    @ObservedObject private var animator = HihiAnimator.shared
     @ObservedObject private var launchAtLogin = LaunchAtLoginManager.shared
 
     init() {
-        MoonwalkTimer.shared.start()
+        HihiTimer.shared.start()
     }
 
     var body: some Scene {
-        MenuBarExtra("MoonWalk", systemImage: "figure.walk") {
+        MenuBarExtra("Hihi", systemImage: "figure.walk") {
             Button("Moonwalk Now") {
-                MoonwalkTimer.shared.reset()
-                MoonwalkAnimator.shared.startMoonwalk()
+                HihiTimer.shared.reset()
+                HihiAnimator.shared.startAnimation()
             }
             .disabled(animator.isAnimating)
             .keyboardShortcut("m", modifiers: [.command, .shift])
@@ -66,7 +66,7 @@ final class PreferencesWindowController {
             backing: .buffered,
             defer: false
         )
-        window.title = "MoonWalk Preferences"
+        window.title = "Hihi Preferences"
         window.contentView = hostingView
         window.center()
         window.isReleasedWhenClosed = false

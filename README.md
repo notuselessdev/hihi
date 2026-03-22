@@ -60,7 +60,7 @@ You only need to do this once.
 ```sh
 git clone https://github.com/notuselessdev/hihi.git
 cd hihi
-open MoonWalk.xcodeproj
+open Hihi.xcodeproj
 ```
 
 Build and run from Xcode (`Cmd+R`).

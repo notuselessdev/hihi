@@ -5,9 +5,9 @@ import CoreImage
 
 /// Plays the moonwalk video across the overlay window and triggers audio at random points.
 @MainActor
-final class MoonwalkAnimator: ObservableObject {
+final class HihiAnimator: ObservableObject {
 
-    static let shared = MoonwalkAnimator()
+    static let shared = HihiAnimator()
 
     // MARK: - Configuration
 
@@ -32,13 +32,13 @@ final class MoonwalkAnimator: ObservableObject {
 
     // MARK: - Public API
 
-    func startMoonwalk(completion: (() -> Void)? = nil) {
+    func startAnimation(completion: (() -> Void)? = nil) {
         guard !isAnimating else { return }
         isAnimating = true
         onComplete = completion
 
         guard let videoURL = Bundle.main.url(forResource: "moonwalk", withExtension: "mp4") else {
-            stopMoonwalk()
+            stopAnimation()
             return
         }
 
@@ -104,7 +104,7 @@ final class MoonwalkAnimator: ObservableObject {
 
         heeHeeTimer = Timer.scheduledTimer(withTimeInterval: heeHeeDelay, repeats: false) { [weak self] _ in
             Task { @MainActor in
-                MoonwalkAudioPlayer.shared.playHeeHee()
+                HihiAudioPlayer.shared.playHeeHee()
                 if PreferencesManager.shared.speechBubbleEnabled {
                     self?.showSpeechBubble(text: "hee-hee!")
                 }
@@ -113,7 +113,7 @@ final class MoonwalkAnimator: ObservableObject {
 
         hooooTimer = Timer.scheduledTimer(withTimeInterval: hooooDelay, repeats: false) { [weak self] _ in
             Task { @MainActor in
-                MoonwalkAudioPlayer.shared.playHoooo()
+                HihiAudioPlayer.shared.playHoooo()
                 if PreferencesManager.shared.speechBubbleEnabled {
                     self?.showSpeechBubble(text: "hoooo!")
                 }
@@ -127,12 +127,12 @@ final class MoonwalkAnimator: ObservableObject {
             hostView.animator().frame.origin.x = endX
         }, completionHandler: { [weak self] in
             Task { @MainActor in
-                self?.stopMoonwalk()
+                self?.stopAnimation()
             }
         })
     }
 
-    func stopMoonwalk() {
+    func stopAnimation() {
         heeHeeTimer?.invalidate()
         heeHeeTimer = nil
         hooooTimer?.invalidate()
