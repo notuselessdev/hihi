@@ -73,7 +73,7 @@ final class HeeHeeAnimator: ObservableObject {
         }
 
         // Host view for the AVPlayerLayer
-        let hostView = NSView(frame: NSRect(x: startX, y: -20, width: size.width, height: size.height))
+        let hostView = NSView(frame: NSRect(x: startX, y: -35, width: size.width, height: size.height))
         hostView.wantsLayer = true
 
         let layer = AVPlayerLayer(player: avPlayer)
@@ -84,7 +84,7 @@ final class HeeHeeAnimator: ObservableObject {
 
         // Flip horizontally when going left to right so the character faces the correct direction
         if goingRight {
-            hostView.layer?.transform = CATransform3DMakeScale(-1, 1, 1)
+            layer.transform = CATransform3DMakeScale(-1, 1, 1)
         }
 
         controller.window.contentView?.addSubview(hostView)
