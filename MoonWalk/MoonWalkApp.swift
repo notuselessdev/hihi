@@ -3,6 +3,7 @@ import SwiftUI
 @main
 struct MoonWalkApp: App {
     @ObservedObject private var animator = MoonwalkAnimator.shared
+    @ObservedObject private var launchAtLogin = LaunchAtLoginManager.shared
 
     init() {
         MoonwalkTimer.shared.start()
@@ -16,6 +17,10 @@ struct MoonWalkApp: App {
             }
             .disabled(animator.isAnimating)
             .keyboardShortcut("m", modifiers: [.command, .shift])
+
+            Divider()
+
+            Toggle("Launch at Login", isOn: $launchAtLogin.isEnabled)
 
             Divider()
 
