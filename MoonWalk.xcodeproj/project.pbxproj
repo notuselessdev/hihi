@@ -13,6 +13,7 @@
 		AA00000A /* MoonwalkAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000B /* MoonwalkAnimator.swift */; };
 		AA00000C /* HihiAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000D /* HihiAudioPlayer.swift */; };
 		AA00000E /* hihi.m4a in Resources */ = {isa = PBXBuildFile; fileRef = AA00000F /* hihi.m4a */; };
+		AA000012 /* SpeechBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000013 /* SpeechBubbleView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +26,7 @@
 		AA00000B /* MoonwalkAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoonwalkAnimator.swift; sourceTree = "<group>"; };
 		AA00000D /* HihiAudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HihiAudioPlayer.swift; sourceTree = "<group>"; };
 		AA00000F /* hihi.m4a */ = {isa = PBXFileReference; lastKnownFileType = audio.m4a; path = hihi.m4a; sourceTree = "<group>"; };
+		AA000013 /* SpeechBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechBubbleView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +55,7 @@
 				AA000009 /* OverlayWindow.swift */,
 				AA00000B /* MoonwalkAnimator.swift */,
 				AA00000D /* HihiAudioPlayer.swift */,
+				AA000013 /* SpeechBubbleView.swift */,
 				AA00000F /* hihi.m4a */,
 				AA000004 /* Assets.xcassets */,
 				AA000006 /* Info.plist */,
@@ -143,6 +146,7 @@
 				AA000008 /* OverlayWindow.swift in Sources */,
 				AA00000A /* MoonwalkAnimator.swift in Sources */,
 				AA00000C /* HihiAudioPlayer.swift in Sources */,
+				AA000012 /* SpeechBubbleView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

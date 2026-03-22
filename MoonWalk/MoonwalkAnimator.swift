@@ -20,6 +20,7 @@ final class MoonwalkAnimator {
     private var currentFrame = 0
     private(set) var isAnimating = false
     private var hihiTimer: Timer?
+    private var speechBubble: SpeechBubbleView?
 
     private init() {
         spriteFrames = Self.generateFrames()
@@ -66,9 +67,10 @@ final class MoonwalkAnimator {
         // Schedule "hihi" audio at a random point during the moonwalk
         let duration = Double.random(in: 5...8)
         let hihiDelay = Double.random(in: 0.5...(duration - 1.0))
-        hihiTimer = Timer.scheduledTimer(withTimeInterval: hihiDelay, repeats: false) { _ in
+        hihiTimer = Timer.scheduledTimer(withTimeInterval: hihiDelay, repeats: false) { [weak self] _ in
             Task { @MainActor in
                 HihiAudioPlayer.shared.play()
+                self?.showSpeechBubble()
             }
         }
 
@@ -89,11 +91,48 @@ final class MoonwalkAnimator {
         frameTimer = nil
         hihiTimer?.invalidate()
         hihiTimer = nil
+        speechBubble?.removeFromSuperview()
+        speechBubble = nil
         spriteView?.removeFromSuperview()
         spriteView = nil
         currentFrame = 0
         isAnimating = false
         OverlayWindowController.shared.hide()
+    }
+
+    // MARK: - Speech Bubble
+
+    private func showSpeechBubble() {
+        guard let spriteView = spriteView else { return }
+
+        // Get the sprite's current on-screen position from the presentation layer
+        let spriteX: CGFloat
+        if let presentationLayer = spriteView.layer?.presentation() {
+            spriteX = presentationLayer.frame.origin.x
+        } else {
+            spriteX = spriteView.frame.origin.x
+        }
+
+        let bubble = SpeechBubbleView.create()
+        let bubbleX = spriteX + Self.spriteSize.width / 2 - bubble.frame.width / 2
+        let bubbleY = spriteView.frame.origin.y + Self.spriteSize.height + 5
+        bubble.frame.origin = NSPoint(x: bubbleX, y: bubbleY)
+        bubble.alphaValue = 1.0
+
+        OverlayWindowController.shared.window.contentView?.addSubview(bubble)
+        speechBubble = bubble
+
+        // Fade out after 1.5 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+            guard let bubble = self?.speechBubble else { return }
+            NSAnimationContext.runAnimationGroup({ context in
+                context.duration = 0.5
+                bubble.animator().alphaValue = 0.0
+            }, completionHandler: { [weak self] in
+                self?.speechBubble?.removeFromSuperview()
+                self?.speechBubble = nil
+            })
+        }
     }
 
     // MARK: - Frame Animation
