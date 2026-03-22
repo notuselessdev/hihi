@@ -1,19 +1,19 @@
 import SwiftUI
 
 @main
-struct HihiApp: App {
-    @ObservedObject private var animator = HihiAnimator.shared
+struct HeeHeeApp: App {
+    @ObservedObject private var animator = HeeHeeAnimator.shared
     @ObservedObject private var launchAtLogin = LaunchAtLoginManager.shared
 
     init() {
-        HihiTimer.shared.start()
+        HeeHeeTimer.shared.start()
     }
 
     var body: some Scene {
-        MenuBarExtra("Hihi", systemImage: "figure.walk") {
-            Button("Moonwalk Now") {
-                HihiTimer.shared.reset()
-                HihiAnimator.shared.startAnimation()
+        MenuBarExtra("hee-hee", systemImage: "figure.walk") {
+            Button("hee-hee! Now") {
+                HeeHeeTimer.shared.reset()
+                HeeHeeAnimator.shared.startAnimation()
             }
             .disabled(animator.isAnimating)
             .keyboardShortcut("m", modifiers: [.command, .shift])
@@ -66,7 +66,7 @@ final class PreferencesWindowController {
             backing: .buffered,
             defer: false
         )
-        window.title = "Hihi Preferences"
+        window.title = "hee-hee Preferences"
         window.contentView = hostingView
         window.center()
         window.isReleasedWhenClosed = false

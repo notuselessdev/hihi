@@ -1,11 +1,11 @@
 import AVFoundation
 import CoreAudio
 
-/// Plays moonwalk audio clips (hee-hee and hoooo), respecting system volume and mute state.
+/// Plays audio clips (hee-hee and hoooo), respecting system volume and mute state.
 @MainActor
-final class HihiAudioPlayer {
+final class HeeHeeAudioPlayer {
 
-    static let shared = HihiAudioPlayer()
+    static let shared = HeeHeeAudioPlayer()
 
     private var players: [AVAudioPlayer] = []
 

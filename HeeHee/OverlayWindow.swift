@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 /// A transparent, click-through overlay window that spans the bottom of the primary display.
-/// Used to render the moonwalk animation without blocking user interaction.
+/// Used to render the animation without blocking user interaction.
 final class OverlayWindow: NSWindow {
     /// Height of the overlay strip at the bottom of the screen.
     static let overlayHeight: CGFloat = 360

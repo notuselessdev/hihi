@@ -3,11 +3,11 @@ import AVFoundation
 import Combine
 import CoreImage
 
-/// Plays the moonwalk video across the overlay window and triggers audio at random points.
+/// Plays the hee-hee video across the overlay window and triggers audio at random points.
 @MainActor
-final class HihiAnimator: ObservableObject {
+final class HeeHeeAnimator: ObservableObject {
 
-    static let shared = HihiAnimator()
+    static let shared = HeeHeeAnimator()
 
     // MARK: - Configuration
 
@@ -37,7 +37,7 @@ final class HihiAnimator: ObservableObject {
         isAnimating = true
         onComplete = completion
 
-        guard let videoURL = Bundle.main.url(forResource: "moonwalk", withExtension: "mp4") else {
+        guard let videoURL = Bundle.main.url(forResource: "hee-hee", withExtension: "mp4") else {
             stopAnimation()
             return
         }
@@ -104,7 +104,7 @@ final class HihiAnimator: ObservableObject {
 
         heeHeeTimer = Timer.scheduledTimer(withTimeInterval: heeHeeDelay, repeats: false) { [weak self] _ in
             Task { @MainActor in
-                HihiAudioPlayer.shared.playHeeHee()
+                HeeHeeAudioPlayer.shared.playHeeHee()
                 if PreferencesManager.shared.speechBubbleEnabled {
                     self?.showSpeechBubble(text: "hee-hee!")
                 }
@@ -113,7 +113,7 @@ final class HihiAnimator: ObservableObject {
 
         hooooTimer = Timer.scheduledTimer(withTimeInterval: hooooDelay, repeats: false) { [weak self] _ in
             Task { @MainActor in
-                HihiAudioPlayer.shared.playHoooo()
+                HeeHeeAudioPlayer.shared.playHoooo()
                 if PreferencesManager.shared.speechBubbleEnabled {
                     self?.showSpeechBubble(text: "hoooo!")
                 }

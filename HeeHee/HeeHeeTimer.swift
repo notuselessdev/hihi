@@ -1,11 +1,11 @@
 import AppKit
 
-/// Manages automatic moonwalk triggering at random intervals between 5 and 30 minutes.
+/// Manages automatic animation triggering at random intervals.
 /// Pauses when the app is deactivated and resumes when reactivated.
 @MainActor
-final class HihiTimer {
+final class HeeHeeTimer {
 
-    static let shared = HihiTimer()
+    static let shared = HeeHeeTimer()
 
     private var minInterval: TimeInterval {
         PreferencesManager.shared.minIntervalMinutes * 60
@@ -47,7 +47,7 @@ final class HihiTimer {
         scheduleNext()
     }
 
-    /// Resets the timer (e.g., after a manual moonwalk trigger).
+    /// Resets the timer (e.g., after a manual trigger).
     func reset() {
         timer?.invalidate()
         timer = nil
@@ -67,14 +67,14 @@ final class HihiTimer {
     }
 
     private func fire() {
-        guard !HihiAnimator.shared.isAnimating else {
+        guard !HeeHeeAnimator.shared.isAnimating else {
             // If already animating, reschedule
             scheduleNext()
             return
         }
-        HihiAnimator.shared.startAnimation {
+        HeeHeeAnimator.shared.startAnimation {
             Task { @MainActor in
-                HihiTimer.shared.scheduleNext()
+                HeeHeeTimer.shared.scheduleNext()
             }
         }
     }

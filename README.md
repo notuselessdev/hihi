@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="mj.png" alt="Hihi" width="200">
+  <img src="mj.png" alt="hee-hee" width="200">
 </p>
 
-<h1 align="center">Hihi</h1>
+<h1 align="center">hee-hee</h1>
 
-<p align="center">A macOS menu bar app that makes Michael Jackson moonwalk across the bottom of your screen at random intervals, complete with "hee-hee!" and "hoooo!" sound effects and speech bubbles.</p>
+<p align="center">A macOS menu bar app that makes Michael Jackson dance across the bottom of your screen at random intervals, complete with "hee-hee!" and "hoooo!" sound effects and speech bubbles.</p>
 
 <p align="center">
   <a href="https://github.com/notuselessdev/hihi/releases/latest"><img src="https://img.shields.io/github/v/release/notuselessdev/hihi" alt="Release"></a>
@@ -24,15 +24,15 @@ brew install notuselessdev/tap/hihi
 
 ### Manual
 
-Download the latest `.dmg` from [Releases](https://github.com/notuselessdev/hihi/releases) and drag Hihi to your Applications folder.
+Download the latest `.dmg` from [Releases](https://github.com/notuselessdev/hihi/releases) and drag hee-hee to your Applications folder.
 
 ### macOS Gatekeeper
 
-Hihi is not notarized by Apple, so macOS will block it the first time you open it. To allow it:
+hee-hee is not notarized by Apple, so macOS will block it the first time you open it. To allow it:
 
-1. Open Hihi -- macOS will show a warning and prevent it from opening
+1. Open hee-hee -- macOS will show a warning and prevent it from opening
 2. Go to **System Settings > Privacy & Security**
-3. Scroll down to the Security section -- you'll see a message about Hihi being blocked
+3. Scroll down to the Security section -- you'll see a message about hee-hee being blocked
 4. Click **Open Anyway**
 5. Confirm in the dialog that appears
 
@@ -41,7 +41,7 @@ You only need to do this once.
 ## Features
 
 - Lives in the menu bar -- no dock icon
-- MJ moonwalks across the bottom of your screen at random intervals (5-60 min, configurable)
+- MJ dances across the bottom of your screen at random intervals (1-60 min, configurable)
 - Alternates direction each walk with sprite flipping
 - Green-screen video with real-time chroma key compositing
 - "hee-hee!" and "hoooo!" sound effects at random points during each walk
@@ -60,7 +60,7 @@ You only need to do this once.
 ```sh
 git clone https://github.com/notuselessdev/hihi.git
 cd hihi
-open Hihi.xcodeproj
+open HeeHee.xcodeproj
 ```
 
 Build and run from Xcode (`Cmd+R`).
