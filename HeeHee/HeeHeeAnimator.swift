@@ -27,14 +27,11 @@ final class HeeHeeAnimator: ObservableObject {
     private var endObserver: Any?
     @Published private(set) var isAnimating = false
     private var lastWentRight: Bool? = nil
-    private let chromakeyFilterData: CIFilter
-    private let videoAsset: AVAsset?
+    private lazy var chromakeyFilterData: CIFilter = Self.chromakeyFilter(fromHue: 0.25, toHue: 0.45)
+    private lazy var videoAsset: AVAsset? = Bundle.main.url(forResource: "hee-hee", withExtension: "mp4")
+        .map { AVAsset(url: $0) }
 
-    private init() {
-        chromakeyFilterData = Self.chromakeyFilter(fromHue: 0.25, toHue: 0.45)
-        videoAsset = Bundle.main.url(forResource: "hee-hee", withExtension: "mp4")
-            .map { AVAsset(url: $0) }
-    }
+    private init() {}
 
     // MARK: - Public API
 
