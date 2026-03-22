@@ -1,32 +1,34 @@
 import AppKit
+import AVFoundation
 import Combine
+import CoreImage
 
-/// Generates moonwalk sprite frames programmatically and animates them across the overlay window.
+/// Plays the moonwalk video across the overlay window and triggers audio at random points.
 @MainActor
 final class MoonwalkAnimator: ObservableObject {
 
     static let shared = MoonwalkAnimator()
 
-    // MARK: - Sprite Configuration
+    // MARK: - Configuration
 
-    private static let spriteSize = NSSize(width: 80, height: 150)
-    private static let frameCount = 4
-    private static let framesPerSecond: Double = 8
+    /// Display size for the video in the overlay (square video, fit to overlay height).
+    private static let videoDisplaySize = NSSize(width: 280, height: 280)
 
     // MARK: - State
 
-    private let spriteFrames: [NSImage]
-    private var spriteView: NSImageView?
-    private var frameTimer: Timer?
-    private var currentFrame = 0
-    @Published private(set) var isAnimating = false
-    private var hihiTimer: Timer?
+    private var player: AVPlayer?
+    private var playerLayer: AVPlayerLayer?
+    private var videoHostView: NSView?
+    private var heeHeeTimer: Timer?
+    private var hooooTimer: Timer?
     private var speechBubble: SpeechBubbleView?
+    private var bubbleTrackingTimer: Timer?
     private var onComplete: (() -> Void)?
+    private var endObserver: Any?
+    @Published private(set) var isAnimating = false
+    private var lastWentRight: Bool? = nil
 
-    private init() {
-        spriteFrames = Self.generateFrames()
-    }
+    private init() {}
 
     // MARK: - Public API
 
@@ -35,53 +37,94 @@ final class MoonwalkAnimator: ObservableObject {
         isAnimating = true
         onComplete = completion
 
+        guard let videoURL = Bundle.main.url(forResource: "moonwalk", withExtension: "mp4") else {
+            stopMoonwalk()
+            return
+        }
+
         let controller = OverlayWindowController.shared
         controller.show()
 
-        let goingRight = Bool.random()
+        let goingRight: Bool
+        if let last = lastWentRight {
+            goingRight = !last
+        } else {
+            goingRight = Bool.random()
+        }
+        lastWentRight = goingRight
         let screenWidth = controller.window.frame.width
-        let size = Self.spriteSize
+        let size = Self.videoDisplaySize
 
-        // Position sprite just off-screen on the starting side
         let startX: CGFloat = goingRight ? -size.width : screenWidth
         let endX: CGFloat = goingRight ? screenWidth : -size.width
 
-        let imageView = NSImageView(frame: NSRect(x: startX, y: 10, width: size.width, height: size.height))
-        imageView.imageScaling = .scaleProportionallyUpOrDown
-        imageView.image = spriteFrames[0]
-        imageView.wantsLayer = true
+        // Set up AVPlayer with chromakey composition to remove green screen
+        let asset = AVAsset(url: videoURL)
+        let playerItem = AVPlayerItem(asset: asset)
+        playerItem.videoComposition = Self.makeChromakeyComposition(for: asset)
 
-        // Moonwalk faces left by default; flip when going right
-        if goingRight {
-            imageView.layer?.transform = CATransform3DMakeScale(-1, 1, 1)
+        let avPlayer = AVPlayer(playerItem: playerItem)
+        avPlayer.isMuted = true
+        player = avPlayer
+
+        // Loop the video
+        endObserver = NotificationCenter.default.addObserver(
+            forName: .AVPlayerItemDidPlayToEndTime,
+            object: playerItem,
+            queue: .main
+        ) { [weak avPlayer] _ in
+            avPlayer?.seek(to: .zero)
+            avPlayer?.play()
         }
 
-        controller.window.contentView?.addSubview(imageView)
-        spriteView = imageView
+        // Host view for the AVPlayerLayer
+        let hostView = NSView(frame: NSRect(x: startX, y: -20, width: size.width, height: size.height))
+        hostView.wantsLayer = true
 
-        // Start frame-by-frame animation
-        currentFrame = 0
-        frameTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / Self.framesPerSecond, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                self?.advanceFrame()
-            }
+        let layer = AVPlayerLayer(player: avPlayer)
+        layer.frame = hostView.bounds
+        layer.videoGravity = .resizeAspect
+        layer.backgroundColor = NSColor.clear.cgColor
+        hostView.layer?.addSublayer(layer)
+
+        // Flip horizontally when going right to left so the character faces the correct direction
+        if !goingRight {
+            hostView.layer?.transform = CATransform3DMakeScale(-1, 1, 1)
         }
 
-        // Schedule "hihi" audio at a random point during the moonwalk
+        controller.window.contentView?.addSubview(hostView)
+        videoHostView = hostView
+        playerLayer = layer
+        avPlayer.play()
+
+        // Schedule audio at random points during the slide
         let duration = Double.random(in: 5...8)
-        let hihiDelay = Double.random(in: 0.5...(duration - 1.0))
-        hihiTimer = Timer.scheduledTimer(withTimeInterval: hihiDelay, repeats: false) { [weak self] _ in
+        let heeHeeDelay = Double.random(in: 0.5...(duration * 0.5))
+        let hooooDelay = Double.random(in: (duration * 0.5)...(duration - 1.0))
+
+        heeHeeTimer = Timer.scheduledTimer(withTimeInterval: heeHeeDelay, repeats: false) { [weak self] _ in
             Task { @MainActor in
-                HihiAudioPlayer.shared.play()
-                self?.showSpeechBubble()
+                MoonwalkAudioPlayer.shared.playHeeHee()
+                if PreferencesManager.shared.speechBubbleEnabled {
+                    self?.showSpeechBubble(text: "hee-hee!")
+                }
             }
         }
 
-        // Slide across the screen over 5-8 seconds
+        hooooTimer = Timer.scheduledTimer(withTimeInterval: hooooDelay, repeats: false) { [weak self] _ in
+            Task { @MainActor in
+                MoonwalkAudioPlayer.shared.playHoooo()
+                if PreferencesManager.shared.speechBubbleEnabled {
+                    self?.showSpeechBubble(text: "hoooo!")
+                }
+            }
+        }
+
+        // Slide across the screen
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = duration
             context.timingFunction = CAMediaTimingFunction(name: .linear)
-            imageView.animator().frame.origin.x = endX
+            hostView.animator().frame.origin.x = endX
         }, completionHandler: { [weak self] in
             Task { @MainActor in
                 self?.stopMoonwalk()
@@ -90,49 +133,150 @@ final class MoonwalkAnimator: ObservableObject {
     }
 
     func stopMoonwalk() {
-        frameTimer?.invalidate()
-        frameTimer = nil
-        hihiTimer?.invalidate()
-        hihiTimer = nil
+        heeHeeTimer?.invalidate()
+        heeHeeTimer = nil
+        hooooTimer?.invalidate()
+        hooooTimer = nil
+        bubbleTrackingTimer?.invalidate()
+        bubbleTrackingTimer = nil
+
+        if let observer = endObserver {
+            NotificationCenter.default.removeObserver(observer)
+            endObserver = nil
+        }
+
+        player?.pause()
+        player = nil
+        playerLayer?.removeFromSuperlayer()
+        playerLayer = nil
+
         speechBubble?.removeFromSuperview()
         speechBubble = nil
-        spriteView?.removeFromSuperview()
-        spriteView = nil
-        currentFrame = 0
+        videoHostView?.removeFromSuperview()
+        videoHostView = nil
+
         isAnimating = false
         OverlayWindowController.shared.hide()
+
         let callback = onComplete
         onComplete = nil
         callback?()
     }
 
-    // MARK: - Speech Bubble
+    // MARK: - Chromakey
 
-    private func showSpeechBubble() {
-        guard let spriteView = spriteView else { return }
+    /// Creates an AVVideoComposition that removes green screen pixels in realtime.
+    private static func makeChromakeyComposition(for asset: AVAsset) -> AVVideoComposition {
+        let composition = AVMutableVideoComposition(asset: asset) { request in
+            let source = request.sourceImage.clampedToExtent()
 
-        // Get the sprite's current on-screen position from the presentation layer
-        let spriteX: CGFloat
-        if let presentationLayer = spriteView.layer?.presentation() {
-            spriteX = presentationLayer.frame.origin.x
-        } else {
-            spriteX = spriteView.frame.origin.x
+            // Use CIColorCube to map green pixels to transparent
+            let filter = chromakeyFilter(
+                fromHue: 0.25, // green hue range start (~90°)
+                toHue: 0.45    // green hue range end (~160°)
+            )
+            filter.setValue(source, forKey: kCIInputImageKey)
+
+            if let output = filter.outputImage?.cropped(to: request.sourceImage.extent) {
+                request.finish(with: output, context: nil)
+            } else {
+                request.finish(with: source, context: nil)
+            }
+        }
+        composition.renderSize = CGSize(width: 720, height: 720)
+        return composition
+    }
+
+    /// Builds a CIColorCube filter that maps a hue range to transparent.
+    private static func chromakeyFilter(fromHue: CGFloat, toHue: CGFloat) -> CIFilter {
+        let cubeSize = 64
+        let cubeDataSize = cubeSize * cubeSize * cubeSize * 4
+        var cubeData = [Float](repeating: 0, count: cubeDataSize)
+
+        var offset = 0
+        for z in 0..<cubeSize {
+            let blue = CGFloat(z) / CGFloat(cubeSize - 1)
+            for y in 0..<cubeSize {
+                let green = CGFloat(y) / CGFloat(cubeSize - 1)
+                for x in 0..<cubeSize {
+                    let red = CGFloat(x) / CGFloat(cubeSize - 1)
+
+                    let hue = getHue(red: red, green: green, blue: blue)
+                    let alpha: Float = (hue >= fromHue && hue <= toHue) ? 0.0 : 1.0
+
+                    cubeData[offset]     = Float(red) * alpha    // premultiplied
+                    cubeData[offset + 1] = Float(green) * alpha
+                    cubeData[offset + 2] = Float(blue) * alpha
+                    cubeData[offset + 3] = alpha
+                    offset += 4
+                }
+            }
         }
 
-        let bubble = SpeechBubbleView.create()
-        let bubbleX = spriteX + Self.spriteSize.width / 2 - bubble.frame.width / 2
-        let bubbleY = spriteView.frame.origin.y + Self.spriteSize.height + 5
-        bubble.frame.origin = NSPoint(x: bubbleX, y: bubbleY)
+        let data = Data(bytes: cubeData, count: cubeDataSize * MemoryLayout<Float>.size)
+
+        let filter = CIFilter(name: "CIColorCube")!
+        filter.setValue(cubeSize, forKey: "inputCubeDimension")
+        filter.setValue(data, forKey: "inputCubeData")
+        return filter
+    }
+
+    /// Converts RGB to hue (0.0–1.0).
+    private static func getHue(red: CGFloat, green: CGFloat, blue: CGFloat) -> CGFloat {
+        let maxVal = max(red, green, blue)
+        let minVal = min(red, green, blue)
+        let delta = maxVal - minVal
+
+        guard delta > 0.001 else { return 0 }
+
+        var hue: CGFloat
+        if maxVal == red {
+            hue = (green - blue) / delta
+        } else if maxVal == green {
+            hue = 2.0 + (blue - red) / delta
+        } else {
+            hue = 4.0 + (red - green) / delta
+        }
+
+        hue /= 6.0
+        if hue < 0 { hue += 1.0 }
+        return hue
+    }
+
+    // MARK: - Speech Bubble
+
+    private func showSpeechBubble(text: String) {
+        // Remove any existing bubble first
+        speechBubble?.removeFromSuperview()
+        speechBubble = nil
+        bubbleTrackingTimer?.invalidate()
+        bubbleTrackingTimer = nil
+
+        guard let hostView = videoHostView else { return }
+
+        let bubble = SpeechBubbleView.create(text: text)
         bubble.alphaValue = 1.0
+
+        // Position bubble above the character's current location
+        positionBubble(bubble, above: hostView)
 
         OverlayWindowController.shared.window.contentView?.addSubview(bubble)
         speechBubble = bubble
 
-        // Fade out after 1.5 seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) { [weak self] in
+        // Track the character so the bubble follows along
+        bubbleTrackingTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
+            Task { @MainActor in
+                guard let self, let bubble = self.speechBubble, let hostView = self.videoHostView else { return }
+                self.positionBubble(bubble, above: hostView)
+            }
+        }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) { [weak self] in
+            self?.bubbleTrackingTimer?.invalidate()
+            self?.bubbleTrackingTimer = nil
             guard let bubble = self?.speechBubble else { return }
             NSAnimationContext.runAnimationGroup({ context in
-                context.duration = 0.5
+                context.duration = 0.8
                 bubble.animator().alphaValue = 0.0
             }, completionHandler: { [weak self] in
                 self?.speechBubble?.removeFromSuperview()
@@ -141,143 +285,15 @@ final class MoonwalkAnimator: ObservableObject {
         }
     }
 
-    // MARK: - Frame Animation
-
-    private func advanceFrame() {
-        currentFrame = (currentFrame + 1) % spriteFrames.count
-        spriteView?.image = spriteFrames[currentFrame]
-    }
-
-    // MARK: - Sprite Generation
-
-    /// Generates moonwalk animation frames as a simple silhouette figure with hat.
-    /// Each frame varies the leg positions to simulate the moonwalk slide.
-    private static func generateFrames() -> [NSImage] {
-        (0..<frameCount).map { drawFrame(index: $0) }
-    }
-
-    private static func drawFrame(index: Int) -> NSImage {
-        let size = spriteSize
-        let image = NSImage(size: size)
-        image.lockFocus()
-
-        let color = NSColor.black
-        color.setFill()
-        color.setStroke()
-
-        let cx: CGFloat = size.width / 2  // center x
-
-        // --- Hat (fedora) ---
-        let hatBrim = NSBezierPath(ovalIn: NSRect(x: cx - 22, y: 128, width: 44, height: 10))
-        hatBrim.fill()
-        let hatTop = NSBezierPath(roundedRect: NSRect(x: cx - 14, y: 133, width: 28, height: 14), xRadius: 6, yRadius: 6)
-        hatTop.fill()
-
-        // --- Head ---
-        let head = NSBezierPath(ovalIn: NSRect(x: cx - 12, y: 110, width: 24, height: 24))
-        head.fill()
-
-        // --- Body (torso) ---
-        let torso = NSBezierPath()
-        torso.lineWidth = 4
-        torso.move(to: NSPoint(x: cx, y: 110))
-        torso.line(to: NSPoint(x: cx, y: 60))
-        torso.stroke()
-
-        // --- Arms (slight swing) ---
-        let armSwing: CGFloat = index % 2 == 0 ? 5 : -5
-        let arms = NSBezierPath()
-        arms.lineWidth = 3
-        // Left arm
-        arms.move(to: NSPoint(x: cx, y: 100))
-        arms.line(to: NSPoint(x: cx - 20 + armSwing, y: 75))
-        // Right arm
-        arms.move(to: NSPoint(x: cx, y: 100))
-        arms.line(to: NSPoint(x: cx + 20 - armSwing, y: 75))
-        arms.stroke()
-
-        // --- Legs (moonwalk cycle) ---
-        // 4 frames: alternating which foot is flat vs on toes
-        let legs = NSBezierPath()
-        legs.lineWidth = 4
-
-        switch index {
-        case 0:
-            // Left leg: back, flat foot; Right leg: forward, on toes
-            // Left leg
-            legs.move(to: NSPoint(x: cx, y: 60))
-            legs.line(to: NSPoint(x: cx - 15, y: 30))
-            legs.line(to: NSPoint(x: cx - 20, y: 8))
-            // Left foot (flat)
-            legs.move(to: NSPoint(x: cx - 28, y: 8))
-            legs.line(to: NSPoint(x: cx - 12, y: 8))
-
-            // Right leg
-            legs.move(to: NSPoint(x: cx, y: 60))
-            legs.line(to: NSPoint(x: cx + 12, y: 32))
-            legs.line(to: NSPoint(x: cx + 10, y: 14))
-            // Right foot (on toes)
-            legs.move(to: NSPoint(x: cx + 6, y: 14))
-            legs.line(to: NSPoint(x: cx + 14, y: 8))
-
-        case 1:
-            // Transition: legs closer together
-            // Left leg
-            legs.move(to: NSPoint(x: cx, y: 60))
-            legs.line(to: NSPoint(x: cx - 8, y: 30))
-            legs.line(to: NSPoint(x: cx - 10, y: 8))
-            // Left foot
-            legs.move(to: NSPoint(x: cx - 18, y: 8))
-            legs.line(to: NSPoint(x: cx - 4, y: 8))
-
-            // Right leg
-            legs.move(to: NSPoint(x: cx, y: 60))
-            legs.line(to: NSPoint(x: cx + 8, y: 30))
-            legs.line(to: NSPoint(x: cx + 6, y: 12))
-            // Right foot (going flat)
-            legs.move(to: NSPoint(x: cx, y: 8))
-            legs.line(to: NSPoint(x: cx + 14, y: 8))
-
-        case 2:
-            // Right leg: back, flat foot; Left leg: forward, on toes
-            // Right leg
-            legs.move(to: NSPoint(x: cx, y: 60))
-            legs.line(to: NSPoint(x: cx + 15, y: 30))
-            legs.line(to: NSPoint(x: cx + 20, y: 8))
-            // Right foot (flat)
-            legs.move(to: NSPoint(x: cx + 12, y: 8))
-            legs.line(to: NSPoint(x: cx + 28, y: 8))
-
-            // Left leg
-            legs.move(to: NSPoint(x: cx, y: 60))
-            legs.line(to: NSPoint(x: cx - 12, y: 32))
-            legs.line(to: NSPoint(x: cx - 10, y: 14))
-            // Left foot (on toes)
-            legs.move(to: NSPoint(x: cx - 14, y: 14))
-            legs.line(to: NSPoint(x: cx - 6, y: 8))
-
-        default:
-            // Transition: legs closer together (mirrored)
-            // Right leg
-            legs.move(to: NSPoint(x: cx, y: 60))
-            legs.line(to: NSPoint(x: cx + 8, y: 30))
-            legs.line(to: NSPoint(x: cx + 10, y: 8))
-            // Right foot
-            legs.move(to: NSPoint(x: cx + 4, y: 8))
-            legs.line(to: NSPoint(x: cx + 18, y: 8))
-
-            // Left leg
-            legs.move(to: NSPoint(x: cx, y: 60))
-            legs.line(to: NSPoint(x: cx - 8, y: 30))
-            legs.line(to: NSPoint(x: cx - 6, y: 12))
-            // Left foot (going flat)
-            legs.move(to: NSPoint(x: cx - 14, y: 8))
-            legs.line(to: NSPoint(x: cx, y: 8))
+    private func positionBubble(_ bubble: SpeechBubbleView, above hostView: NSView) {
+        let spriteX: CGFloat
+        if let presentationLayer = hostView.layer?.presentation() {
+            spriteX = presentationLayer.frame.origin.x
+        } else {
+            spriteX = hostView.frame.origin.x
         }
-
-        legs.stroke()
-
-        image.unlockFocus()
-        return image
+        let bubbleX = spriteX + Self.videoDisplaySize.width / 2 - bubble.frame.width / 2
+        let bubbleY = hostView.frame.origin.y + Self.videoDisplaySize.height + 5
+        bubble.frame.origin = NSPoint(x: bubbleX, y: bubbleY)
     }
 }

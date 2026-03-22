@@ -1,28 +1,38 @@
 import AVFoundation
 import CoreAudio
 
-/// Plays the "hihi" audio clip, respecting system volume and mute state.
+/// Plays moonwalk audio clips (hee-hee and hoooo), respecting system volume and mute state.
 @MainActor
-final class HihiAudioPlayer {
+final class MoonwalkAudioPlayer {
 
-    static let shared = HihiAudioPlayer()
+    static let shared = MoonwalkAudioPlayer()
 
-    private var player: AVAudioPlayer?
+    private var players: [AVAudioPlayer] = []
 
     private init() {}
 
-    /// Plays the hihi sound once. Does nothing if the system is muted.
-    func play() {
+    /// Plays the hee-hee sound once.
+    func playHeeHee() {
+        playSound(resource: "hee-hee", ext: "mp3")
+    }
+
+    /// Plays the hoooo sound once.
+    func playHoooo() {
+        playSound(resource: "hoooo", ext: "mp3")
+    }
+
+    private func playSound(resource: String, ext: String) {
         guard PreferencesManager.shared.soundEnabled else { return }
         guard !isSystemMuted() else { return }
 
-        guard let url = Bundle.main.url(forResource: "hihi", withExtension: "m4a") else { return }
+        guard let url = Bundle.main.url(forResource: resource, withExtension: ext) else { return }
 
         do {
             let audioPlayer = try AVAudioPlayer(contentsOf: url)
-            audioPlayer.volume = 1.0  // Use full volume — AVAudioPlayer respects system volume automatically
+            audioPlayer.volume = 1.0
             audioPlayer.play()
-            player = audioPlayer  // Retain until playback finishes
+            players.removeAll { !$0.isPlaying }
+            players.append(audioPlayer)
         } catch {
             // Silently fail — audio is a nice-to-have
         }

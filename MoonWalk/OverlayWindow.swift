@@ -5,7 +5,7 @@ import SwiftUI
 /// Used to render the moonwalk animation without blocking user interaction.
 final class OverlayWindow: NSWindow {
     /// Height of the overlay strip at the bottom of the screen.
-    static let overlayHeight: CGFloat = 200
+    static let overlayHeight: CGFloat = 360
 
     init() {
         guard let screen = NSScreen.main else {

@@ -11,8 +11,10 @@
 		AA000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA000004 /* Assets.xcassets */; };
 		AA000008 /* OverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000009 /* OverlayWindow.swift */; };
 		AA00000A /* MoonwalkAnimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000B /* MoonwalkAnimator.swift */; };
-		AA00000C /* HihiAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000D /* HihiAudioPlayer.swift */; };
-		AA00000E /* hihi.m4a in Resources */ = {isa = PBXBuildFile; fileRef = AA00000F /* hihi.m4a */; };
+		AA00000C /* MoonwalkAudioPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000D /* MoonwalkAudioPlayer.swift */; };
+		AA00000E /* moonwalk.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = AA00000F /* moonwalk.mp4 */; };
+		AA00001A /* hee-hee.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AA00001B /* hee-hee.mp3 */; };
+		AA00001C /* hoooo.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = AA00001D /* hoooo.mp3 */; };
 		AA000012 /* SpeechBubbleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000013 /* SpeechBubbleView.swift */; };
 		AA000014 /* MoonwalkTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000015 /* MoonwalkTimer.swift */; };
 		AA000016 /* LaunchAtLoginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000017 /* LaunchAtLoginManager.swift */; };
@@ -27,8 +29,10 @@
 		AA000007 /* MoonWalk.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MoonWalk.entitlements; sourceTree = "<group>"; };
 		AA000009 /* OverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindow.swift; sourceTree = "<group>"; };
 		AA00000B /* MoonwalkAnimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoonwalkAnimator.swift; sourceTree = "<group>"; };
-		AA00000D /* HihiAudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HihiAudioPlayer.swift; sourceTree = "<group>"; };
-		AA00000F /* hihi.m4a */ = {isa = PBXFileReference; lastKnownFileType = audio.m4a; path = hihi.m4a; sourceTree = "<group>"; };
+		AA00000D /* MoonwalkAudioPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoonwalkAudioPlayer.swift; sourceTree = "<group>"; };
+		AA00000F /* moonwalk.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = moonwalk.mp4; sourceTree = "<group>"; };
+		AA00001B /* hee-hee.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "hee-hee.mp3"; sourceTree = "<group>"; };
+		AA00001D /* hoooo.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = hoooo.mp3; sourceTree = "<group>"; };
 		AA000013 /* SpeechBubbleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechBubbleView.swift; sourceTree = "<group>"; };
 		AA000015 /* MoonwalkTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoonwalkTimer.swift; sourceTree = "<group>"; };
 		AA000017 /* LaunchAtLoginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginManager.swift; sourceTree = "<group>"; };
@@ -60,12 +64,14 @@
 				AA000002 /* MoonWalkApp.swift */,
 				AA000009 /* OverlayWindow.swift */,
 				AA00000B /* MoonwalkAnimator.swift */,
-				AA00000D /* HihiAudioPlayer.swift */,
+				AA00000D /* MoonwalkAudioPlayer.swift */,
 				AA000013 /* SpeechBubbleView.swift */,
 				AA000015 /* MoonwalkTimer.swift */,
 				AA000017 /* LaunchAtLoginManager.swift */,
 				AA000019 /* PreferencesManager.swift */,
-				AA00000F /* hihi.m4a */,
+				AA00000F /* moonwalk.mp4 */,
+				AA00001B /* hee-hee.mp3 */,
+				AA00001D /* hoooo.mp3 */,
 				AA000004 /* Assets.xcassets */,
 				AA000006 /* Info.plist */,
 				AA000007 /* MoonWalk.entitlements */,
@@ -140,7 +146,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA000003 /* Assets.xcassets in Resources */,
-				AA00000E /* hihi.m4a in Resources */,
+				AA00000E /* moonwalk.mp4 in Resources */,
+				AA00001A /* hee-hee.mp3 in Resources */,
+				AA00001C /* hoooo.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

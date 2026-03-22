@@ -1,14 +1,17 @@
 import AppKit
 
-/// A comic-style speech bubble that displays "hihi" text and fades out.
+/// A comic-style speech bubble that displays text and fades out.
 final class SpeechBubbleView: NSView {
 
-    private static let bubbleSize = NSSize(width: 70, height: 45)
+    private static let bubbleSize = NSSize(width: 90, height: 45)
     private static let tailHeight: CGFloat = 10
+
+    private let text: String
 
     override var isFlipped: Bool { false }
 
-    override init(frame frameRect: NSRect) {
+    init(frame frameRect: NSRect, text: String) {
+        self.text = text
         super.init(frame: frameRect)
         wantsLayer = true
     }
@@ -55,24 +58,24 @@ final class SpeechBubbleView: NSView {
         NSColor.white.setFill()
         seam.fill()
 
-        // Draw "hihi" text
-        let text = "hihi" as NSString
+        // Draw text
+        let nsText = text as NSString
         let attrs: [NSAttributedString.Key: Any] = [
-            .font: NSFont.boldSystemFont(ofSize: 16),
+            .font: NSFont.boldSystemFont(ofSize: 14),
             .foregroundColor: NSColor.black,
         ]
-        let textSize = text.size(withAttributes: attrs)
+        let textSize = nsText.size(withAttributes: attrs)
         let textOrigin = NSPoint(
             x: bubbleRect.midX - textSize.width / 2,
             y: bubbleRect.midY - textSize.height / 2
         )
-        text.draw(at: textOrigin, withAttributes: attrs)
+        nsText.draw(at: textOrigin, withAttributes: attrs)
     }
 
     /// Creates a speech bubble view sized appropriately.
-    static func create() -> SpeechBubbleView {
+    static func create(text: String = "hee-hee!") -> SpeechBubbleView {
         let totalHeight = bubbleSize.height + tailHeight
-        let view = SpeechBubbleView(frame: NSRect(x: 0, y: 0, width: bubbleSize.width, height: totalHeight))
+        let view = SpeechBubbleView(frame: NSRect(x: 0, y: 0, width: bubbleSize.width, height: totalHeight), text: text)
         return view
     }
 }

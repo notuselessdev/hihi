@@ -25,8 +25,7 @@ struct MoonWalkApp: App {
             Divider()
 
             Button("Preferences...") {
-                NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
-                NSApp.activate(ignoringOtherApps: true)
+                PreferencesWindowController.shared.showWindow()
             }
             .keyboardShortcut(",", modifiers: .command)
 
@@ -37,10 +36,44 @@ struct MoonWalkApp: App {
             }
             .keyboardShortcut("q", modifiers: .command)
         }
+    }
+}
 
-        Settings {
-            PreferencesView()
+// MARK: - Preferences Window
+
+@MainActor
+final class PreferencesWindowController {
+    static let shared = PreferencesWindowController()
+
+    private var window: NSWindow?
+
+    private init() {}
+
+    func showWindow() {
+        if let existing = window, existing.isVisible {
+            existing.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
         }
+
+        let preferencesView = PreferencesView()
+        let hostingView = NSHostingView(rootView: preferencesView)
+        hostingView.frame = NSRect(x: 0, y: 0, width: 380, height: 360)
+
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 380, height: 360),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "MoonWalk Preferences"
+        window.contentView = hostingView
+        window.center()
+        window.isReleasedWhenClosed = false
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+
+        self.window = window
     }
 }
 
@@ -80,8 +113,9 @@ struct PreferencesView: View {
                 }
             }
 
-            Section("Sound") {
-                Toggle("Enable \"hihi\" sound", isOn: $prefs.soundEnabled)
+            Section("Effects") {
+                Toggle("Enable sound", isOn: $prefs.soundEnabled)
+                Toggle("Enable speech bubble", isOn: $prefs.speechBubbleEnabled)
             }
 
             Section("General") {
@@ -89,6 +123,6 @@ struct PreferencesView: View {
             }
         }
         .formStyle(.grouped)
-        .frame(width: 380, height: 260)
+        .frame(width: 380, height: 380)
     }
 }
